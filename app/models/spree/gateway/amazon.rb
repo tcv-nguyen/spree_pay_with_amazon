@@ -69,10 +69,13 @@ module Spree
     end
 
     def credit(amount, _credit_card, gateway_options={})
-      order = Spree::Order.find_by(:number => gateway_options[:order_id].split("-")[0])
+      payment = gateway_options[:originator].payment
+      order = payment.order
+      refund_amount = amount / 100.00
+      refund = payment.refunds.eager_load(:reimbursement).find_by(amount: refund_amount, :spree_reimbursements => {reimbursement_status: "pending"})
       load_amazon_mws(order.amazon_order_reference_id)
       capture_id = order.amazon_transaction.capture_id
-      response = @mws.refund(capture_id, gateway_options[:order_id], amount / 100.00, Spree::Config.currency)
+      response = @mws.refund(capture_id, refund.reimbursement.number, refund_amount, Spree::Config.currency)
       return ActiveMerchant::Billing::Response.new(true, "Success", response)
     end
 

@@ -65,7 +65,7 @@ class Spree::AmazonController < Spree::StoreController
 
     if current_order.update_from_params(params, permitted_checkout_attributes, request.headers.env)
 
-      @mws.set_order_data(current_order.total, current_order.currency)
+      @mws.set_order_data(current_order.total, current_order.currency, current_order.number)
 
       result = @mws.confirm_order
 

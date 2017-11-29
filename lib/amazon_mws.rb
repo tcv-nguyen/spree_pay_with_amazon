@@ -50,12 +50,13 @@ class AmazonMws
     }))
   end
 
-  def set_order_data(total, currency)
+  def set_order_data(total, currency, order_number)
     process({
       "Action"=>"SetOrderReferenceDetails",
       "AmazonOrderReferenceId" => @number,
       "OrderReferenceAttributes.OrderTotal.Amount" => total,
-      "OrderReferenceAttributes.OrderTotal.CurrencyCode" => currency
+      "OrderReferenceAttributes.OrderTotal.CurrencyCode" => currency,
+      "OrderReferenceAttributes.SellerOrderAttributes.SellerOrderId" => order_number
     })
   end
 
