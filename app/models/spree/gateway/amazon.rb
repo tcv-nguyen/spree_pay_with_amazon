@@ -87,6 +87,18 @@ module Spree
       return ActiveMerchant::Billing::Response.new(true, "Success", response)
     end
 
+    def cancel(payment_number)
+      payment = Spree::Payment.completed.find_by(number: payment_number)
+      gateway_options = payment.gateway_options
+      order = Spree::Order.find_by(:number => gateway_options[:order_id].split("-")[0])
+      load_amazon_mws(order.amazon_order_reference_id)
+      amazon_transaction = order.amazon_transaction
+      capture_id = amazon_transaction.capture_id
+      response = @mws.refund(capture_id, "R#{Time.current.to_i}", order.total, Spree::Config.currency)
+      @mws.close_order_reference(amazon_transaction.order_reference)
+      return ActiveMerchant::Billing::Response.new(true, "Success", response)
+    end
+
     def close(amount, amazon_checkout, gateway_options={})
       order = Spree::Order.find_by(:number => gateway_options[:order_id].split("-")[0])
       load_amazon_mws(order.amazon_order_reference_id)

@@ -127,6 +127,13 @@ class AmazonMws
       })
   end
 
+  def close_order_reference(reference)
+    process({
+      "Action" => "CloseOrderReference",
+      "AmazonOrderReferenceId" => reference
+    })
+  end
+
   private
 
   def default_hash
